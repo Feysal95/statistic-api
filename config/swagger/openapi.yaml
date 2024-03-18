@@ -44,6 +44,12 @@ paths:
       responses:
         '204':
           description: Successful response
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonError'
 
 components:
   schemas:
@@ -81,3 +87,18 @@ components:
           type: array
           items:
               $ref: '#/components/schemas/CountryFields'
+
+    JsonError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: integer
+              title:
+                type: string
+              detail:
+                type: string

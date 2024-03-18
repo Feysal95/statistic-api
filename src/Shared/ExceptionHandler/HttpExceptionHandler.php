@@ -7,7 +7,6 @@ namespace App\Shared\ExceptionHandler;
 use App\Shared\Exception\InvalidArgumentException;
 use App\Shared\Factory\Dto\ApiPayloadErrorDto;
 use App\Shared\Factory\Dto\ExceptionResponseParamDto;
-use App\Shared\Factory\Dto\PayloadErrorCollectionDto;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
@@ -21,16 +20,12 @@ final readonly class HttpExceptionHandler implements ExceptionHandlerInterface
         }
 
         $status = $e->getStatusCode();
-        $errorCollection = new PayloadErrorCollectionDto();
-
-        $errorCollection->addError(
-            new ApiPayloadErrorDto(
-                status: $status,
-                title: 'Некорректный запрос',
-                detail: $e->getMessage(),
-            ),
+        $error = ApiPayloadErrorDto::create(
+            status: $status,
+            title: 'Некорректный запрос',
+            detail: $e->getMessage(),
         );
 
-        return ExceptionResponseParamDto::create($status, $errorCollection, $e->getHeaders());
+        return ExceptionResponseParamDto::create($status, [$error], $e->getHeaders());
     }
 }

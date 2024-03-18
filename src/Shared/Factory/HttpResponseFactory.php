@@ -14,7 +14,7 @@ final class HttpResponseFactory
     {
         $responseBody = [];
         $responseBody['errors'] = [];
-        foreach ($exceptionResponseParam->errorCollection->getErrors() as $apiPayloadError) {
+        foreach ($exceptionResponseParam->errors as $apiPayloadError) {
             $errorData = [
                 'status' => $apiPayloadError->status,
                 'title' => $apiPayloadError->title,
@@ -23,6 +23,9 @@ final class HttpResponseFactory
 
             if ($apiPayloadError->meta !== null) {
                 $errorData['meta'] = $apiPayloadError->meta;
+            }
+            if ($apiPayloadError->field !== null) {
+                $errorData['field'] = $apiPayloadError->field;
             }
 
             $responseBody['errors'][] = $errorData;

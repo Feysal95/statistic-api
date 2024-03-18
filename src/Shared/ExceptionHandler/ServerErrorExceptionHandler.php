@@ -6,7 +6,6 @@ namespace App\Shared\ExceptionHandler;
 
 use App\Shared\Factory\Dto\ApiPayloadErrorDto;
 use App\Shared\Factory\Dto\ExceptionResponseParamDto;
-use App\Shared\Factory\Dto\PayloadErrorCollectionDto;
 use JsonException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +21,6 @@ final readonly class ServerErrorExceptionHandler implements ExceptionHandlerInte
     public function getOptions(Throwable $e, bool $debug): ExceptionResponseParamDto
     {
         $status = Response::HTTP_INTERNAL_SERVER_ERROR;
-        $errorCollection = new PayloadErrorCollectionDto();
         $meta = null;
 
         if ($debug) {
@@ -33,13 +31,11 @@ final readonly class ServerErrorExceptionHandler implements ExceptionHandlerInte
             ];
         }
 
-        $errorCollection->addError(
-            new ApiPayloadErrorDto(
-                status: $status,
-                title: 'Ошибка сервера',
-                detail: $e->getMessage(),
-                meta: $meta,
-            ),
+        $error = ApiPayloadErrorDto::create(
+            status: $status,
+            title: 'Ошибка сервера',
+            detail: $e->getMessage(),
+            meta: $meta,
         );
 
         $this->logger->error(
@@ -51,6 +47,6 @@ final readonly class ServerErrorExceptionHandler implements ExceptionHandlerInte
             ],
         );
 
-        return ExceptionResponseParamDto::create($status, $errorCollection);
+        return ExceptionResponseParamDto::create($status, [$error]);
     }
 }

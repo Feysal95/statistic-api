@@ -46,7 +46,6 @@ cd statistic-api
 
 ## Адреса
 
-* http://localhost - ссылка на сервис
 * http://localhost/api/docs - локальное Swagger-описание endpoint'ов
 
 ## Инструменты разработчика

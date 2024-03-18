@@ -8,7 +8,6 @@ use App\Shared\Exception\ConstraintValidationErrorException;
 use App\Shared\Exception\InvalidArgumentException;
 use App\Shared\Factory\Dto\ApiPayloadErrorDto;
 use App\Shared\Factory\Dto\ExceptionResponseParamDto;
-use App\Shared\Factory\Dto\PayloadErrorCollectionDto;
 use JsonException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -26,23 +25,22 @@ final class ValidationExceptionHandler implements ExceptionHandlerInterface
         }
 
         $status = Response::HTTP_UNPROCESSABLE_ENTITY;
-        $errorCollection = new PayloadErrorCollectionDto();
+        $errors = [];
 
         /** @var array<string, array<string>> $errorsData */
         $errorsData = json_decode($e->getMessage(), true, 512, JSON_THROW_ON_ERROR);
 
-        foreach ($errorsData as $errorItem) {
+        foreach ($errorsData as $field => $errorItem) {
             foreach ($errorItem as $errorText) {
-                $errorCollection->addError(
-                    new ApiPayloadErrorDto(
-                        status: $status,
-                        title: 'Ошибка валидации',
-                        detail: $errorText,
-                    ),
+                $errors[] = ApiPayloadErrorDto::create(
+                    status: $status,
+                    title: 'Ошибка валидации',
+                    detail: $errorText,
+                    field: $field,
                 );
             }
         }
 
-        return ExceptionResponseParamDto::create($status, $errorCollection);
+        return ExceptionResponseParamDto::create($status, $errors);
     }
 }
