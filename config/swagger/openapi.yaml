@@ -53,40 +53,12 @@ paths:
 
 components:
   schemas:
-    CountryFields:
-      type: object
-      properties:
-        type:
-          type: string
-          example: 'users'
-        id:
-          type: string
-          example: '1'
-        attributes:
-          properties:
-            login:
-              type: string
-              example: 'Anatoly'
-            role:
-              type: string
-              example: 'ROLE_USER'
-            comment:
-              type: string
-              example: 'Manager'
-            isBlocked:
-              type: boolean
-              example: false
-            availablePlatformIds:
-              type: array
-              example: [ 1, 2 ]
-
     CountryListResponse:
       type: object
-      properties:
-        data:
-          type: array
-          items:
-              $ref: '#/components/schemas/CountryFields'
+      example:
+        "RU": "1"
+        "US": "2"
+        "GB": "3"
 
     JsonError:
       type: object
