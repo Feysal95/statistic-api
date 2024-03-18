@@ -1,0 +1,25 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/*/Entity/'
+            - '../src/Kernel.php'
+
+    Predis\ClientInterface: '@Predis\Client'
+    Predis\Client: '@snc_redis.default'
+
+    App\Shared\Listener\RequestJsonContentListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, priority: 1 }
+
+    App\Shared\Listener\ExceptionListener:
+        arguments: [ '%kernel.debug%' ]
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }

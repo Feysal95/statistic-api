@@ -1,0 +1,6 @@
+hb_swagger_ui:
+  directory: '%kernel.project_dir%/config/swagger/'
+  configFile: "config.json"
+  assetUrlPath: '/bundles/hbswaggerui/'
+  files:
+    - "openapi.yaml"

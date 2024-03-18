@@ -1,0 +1,152 @@
+#!/bin/bash
+
+# system variables (do not change)
+ENV=.env.local
+CURRENT_OS="$(uname)"
+LOCAL_UID=$(id -u)
+LOCAL_GID=$(id -g)
+GITLAB_TOKEN=gitlab-access-token
+ARCH=$(uname -m)
+
+fn_usage() {
+  cat <<USAGE >&2
+Usage:
+    ./dc [command]
+    -- environment ---------------------------------------------------
+    install                         Setting up the environment
+    build                           Build docker container
+
+    -- project -------------------------------------------------------
+    up                              Start containers
+    down                            Stop all running docker containers & remove volumes
+    ps                              Show status
+    logs                            Display the log of messages from containers
+    composer                        Install composer require
+    tests                           Run tests
+
+    -- docker bash ----------------------------------------------------
+    bash                            Enter php bash shell
+    bash_test                       Enter php test bash shell
+    nginx                           Enter nginx bash shell
+    redissh                         Enter redis bash shell
+
+    -- variables are used --------------------------------------
+    ENV                             $(if [[ -f ${ENV} ]]; then echo "exist"; else echo "not exist"; fi)
+    LOCAL_UID                       ${LOCAL_UID:-NA}
+
+USAGE
+  exit 0
+}
+
+fn_install() {
+  # stop before build
+  fn_down
+  echo 'All services stopped.'
+
+  # build
+  fn_build
+  echo 'Build done.'
+
+  # up and install composer dependencies
+  fn_up
+  echo 'All services is running.'
+
+  fn_composer
+  echo 'All dependencies are installed.'
+
+  echo 'Done.'
+}
+
+fn_build() {
+    LOCAL_UID=${LOCAL_UID} LOCAL_GID=${LOCAL_GID} docker compose build
+}
+
+fn_up() {
+    LOCAL_UID=${LOCAL_UID} LOCAL_GID=${LOCAL_GID} docker compose up -d
+}
+
+fn_down() {
+    LOCAL_UID=${LOCAL_UID} LOCAL_GID=${LOCAL_GID}  docker compose down --remove-orphans
+}
+
+fn_ps() {
+    LOCAL_UID=${LOCAL_UID} LOCAL_GID=${LOCAL_GID}  docker compose ps
+}
+
+fn_logs() {
+    LOCAL_UID=${LOCAL_UID} LOCAL_GID=${LOCAL_GID} docker compose logs
+}
+
+fn_composer() {
+    docker exec -it -u ${LOCAL_GID} php-fpm composer install
+}
+
+fn_tests() {
+    docker exec -it -u ${LOCAL_GID} php-fpm-test php ./vendor/bin/phpunit --testdox
+}
+
+fn_phpShell() {
+    docker exec -it -u ${LOCAL_GID} php-fpm /bin/bash
+}
+
+fn_phpShellTest() {
+    docker exec -it -u ${LOCAL_GID} php-fpm-test /bin/bash
+}
+
+fn_nginxShell() {
+    docker exec -it nginx /bin/bash
+}
+
+fn_redisShell() {
+    docker exec -it redis /bin/bash
+}
+
+fn_main() {
+  # select command
+  case "$1" in
+    # -- environment --
+    install)
+      fn_install
+      ;;
+    build)
+      fn_build "$@"
+      ;;
+    up)
+      fn_up
+      ;;
+    down)
+      fn_down
+      ;;
+    ps)
+      fn_ps
+      ;;
+    logs)
+      fn_logs
+      ;;
+    composer)
+      fn_composer
+      ;;
+    tests)
+      fn_tests
+      ;;
+    # -- bash --
+    bash)
+      fn_phpShell
+      ;;
+    bash_test)
+      fn_phpShellTest
+      ;;
+    nginx)
+      fn_nginxShell
+      ;;
+    redissh)
+      fn_redisShell
+      ;;
+    # --
+    *)
+      fn_usage
+      ;;
+  esac
+}
+
+fn_main "$@"

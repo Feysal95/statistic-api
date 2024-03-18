@@ -1,0 +1,10 @@
+controllers:
+    resource:
+        path: ../src/Country/Controller/
+        namespace: App\Country\Controller
+    type: attribute
+
+
+_swagger-ui:
+    resource: '@HBSwaggerUiBundle/Resources/config/routing.yml'
+    prefix: /api/docs
