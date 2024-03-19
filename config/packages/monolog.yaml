@@ -23,7 +23,6 @@ when@dev:
                 path: php://stderr
                 level: debug
                 channels: ["!event"]
-                formatter: monolog.formatter.log_processor
             console:
                 type: console
                 process_psr_3_messages: false
@@ -42,7 +41,6 @@ when@prod:
                 type: stream
                 path: php://stderr
                 level: debug
-                formatter: monolog.formatter.log_processor
             console:
                 type: console
                 process_psr_3_messages: false

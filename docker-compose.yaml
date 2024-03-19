@@ -30,7 +30,7 @@ services:
     build:
       context: .
       dockerfile: .docker/Dockerfile
-      target: base-dev
+      target: application_prod
     networks:
       my_network:
         aliases:
